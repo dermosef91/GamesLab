@@ -139,11 +139,8 @@ function drawEnemyHex(ctx, e, color, icon) {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Icon
-  ctx.font = `${r * 0.9}px sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(icon, x, y);
+  // Sprite
+  Sprites.drawEnemy(ctx, e.id, x, y, r * 0.62, color);
 
   // HP bar
   if (e.hp < e.maxHp) {
@@ -187,11 +184,8 @@ function drawBoss(ctx, e, color, icon) {
   ctx.lineWidth = 3;
   ctx.stroke();
 
-  // Icon
-  ctx.font = `${size * 0.85}px sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(icon, x, y);
+  // Sprite
+  Sprites.drawEnemy(ctx, e.id, x, y, size * 0.58, color);
 
   // Boss HP bar (full width at bottom)
   ctx.restore();
@@ -461,7 +455,7 @@ class EnemySpawner {
         const bossId = bossTimeMs <= 600000 ? 'nullKing' : 'entropyDrake';
         const pos = Utils.offscreenSpawn(player.x, player.y, 800, 600);
         enemies.push(new Enemy(ENEMY_DEFS[bossId], pos.x, pos.y, 1, 1));
-        if (particles) particles.popText(player.x, player.y - 60, '⚠ BOSS INCOMING! ⚠', '#ff0000', 22);
+        if (particles) particles.popText(player.x, player.y - 60, '!! BOSS INCOMING !!', '#ff0000', 22);
       }
     }
 

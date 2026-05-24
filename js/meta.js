@@ -3,13 +3,13 @@
 // ============================================================
 
 const BOONS = [
-  { id: 'hp',       name: 'Ancestral Vitality', icon: '💖', desc: 'Start each run with +20 HP',          maxTier: 5, cost: [40, 80, 140, 220, 320], effect: { bonusHp: 20 } },
-  { id: 'xp',       name: 'Griot\'s Wisdom',    icon: '📚', desc: 'Gain +5% XP each run',                maxTier: 5, cost: [35, 70, 120, 200, 300], effect: { bonusXp: 0.05 } },
-  { id: 'speed',    name: 'Ancestor\'s Stride',  icon: '👟', desc: 'Start with +6% movement speed',       maxTier: 4, cost: [50, 110, 200, 340],      effect: { bonusSpeed: 0.06 } },
-  { id: 'armor',    name: 'Iron Spirit',          icon: '🛡️', desc: 'Start with 5% damage reduction',      maxTier: 3, cost: [80, 160, 280],           effect: { bonusArmor: 0.05 } },
-  { id: 'magnet',   name: 'Star Collector',       icon: '⭐', desc: 'XP magnet radius +25% permanently',   maxTier: 3, cost: [60, 130, 230],           effect: { bonusMagnet: 0.25 } },
-  { id: 'nzinga',   name: 'Unlock Queen Nzinga',  icon: '👸', desc: 'Unlock warrior hero Queen Nzinga',    maxTier: 1, cost: [100],                    effect: { unlockChar: 'nzinga' } },
-  { id: 'kwame',    name: 'Unlock Kwame the Griot',icon: '🎵', desc: 'Unlock the sonic warrior Kwame',     maxTier: 1, cost: [150],                    effect: { unlockChar: 'kwame' } },
+  { id: 'hp',       name: 'Ancestral Vitality',   color: '#ff3366', desc: 'Start each run with +20 HP',          maxTier: 5, cost: [40, 80, 140, 220, 320], effect: { bonusHp: 20 } },
+  { id: 'xp',       name: 'Griot\'s Wisdom',       color: '#ffd700', desc: 'Gain +5% XP each run',                maxTier: 5, cost: [35, 70, 120, 200, 300], effect: { bonusXp: 0.05 } },
+  { id: 'speed',    name: 'Ancestor\'s Stride',     color: '#39ff14', desc: 'Start with +6% movement speed',       maxTier: 4, cost: [50, 110, 200, 340],      effect: { bonusSpeed: 0.06 } },
+  { id: 'armor',    name: 'Iron Spirit',             color: '#00ffcc', desc: 'Start with 5% damage reduction',      maxTier: 3, cost: [80, 160, 280],           effect: { bonusArmor: 0.05 } },
+  { id: 'magnet',   name: 'Star Collector',          color: '#00ffff', desc: 'XP magnet radius +25% permanently',   maxTier: 3, cost: [60, 130, 230],           effect: { bonusMagnet: 0.25 } },
+  { id: 'nzinga',   name: 'Unlock Queen Nzinga',     color: '#ffa500', desc: 'Unlock warrior hero Queen Nzinga',    maxTier: 1, cost: [100],                    effect: { unlockChar: 'nzinga' } },
+  { id: 'kwame',    name: 'Unlock Kwame the Griot',  color: '#ff6600', desc: 'Unlock the sonic warrior Kwame',      maxTier: 1, cost: [150],                    effect: { unlockChar: 'kwame' } },
 ];
 
 class MetaProgression {
