@@ -1,0 +1,98 @@
+name: Generate Pixel Art Sprites
+
+# Manual trigger from the Actions tab.
+# Set OPENAI_API_KEY in Settings → Secrets and variables → Actions first.
+on:
+  workflow_dispatch:
+    inputs:
+      characters:
+        description: 'IDs to generate (comma-separated) — leave blank for ALL 10'
+        required: false
+        default: ''
+      model:
+        description: 'OpenAI Image model'
+        required: false
+        default: 'gpt-image-1'
+      skip_template:
+        description: 'Skip template regeneration (uses existing template.png)'
+        type: boolean
+        default: false
+
+# Need write access to commit the generated PNGs back
+permissions:
+  contents: write
+
+jobs:
+  generate-sprites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ── 1. Checkout main (where game code lives) ─────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0   # full history so we can push to gh-pages too
+
+      # ── 2. Node 22 (native fetch + FormData — no npm needed) ─
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # ── 3. Run the generator ─────────────────────────────────
+      - name: Generate sprite sheets
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          ARGS="--model=${{ inputs.model || 'gpt-image-1' }}"
+
+          if [ -n "${{ inputs.characters }}" ]; then
+            ARGS="$ARGS --only=${{ inputs.characters }}"
+          fi
+
+          if [ "${{ inputs.skip_template }}" = "true" ]; then
+            ARGS="$ARGS --skip-template"
+          fi
+
+          echo "▶ node tools/generate-sprites.js $ARGS"
+          node tools/generate-sprites.js $ARGS
+
+      # ── 4. Commit PNGs to main ────────────────────────────────
+      - name: Commit sprites → main
+        id: commit_main
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/sprites/
+
+          if git diff --staged --quiet; then
+            echo "new=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing new to commit."
+          else
+            COUNT=$(git diff --staged --name-only | grep -c '\.png' || true)
+            git commit -m "chore: add ${COUNT} AI pixel art sprite sheets [skip ci]"
+            git push origin main
+            echo "new=true" >> "$GITHUB_OUTPUT"
+            echo "✓ Pushed ${COUNT} sprite sheet(s) to main"
+          fi
+
+      # ── 5. Mirror PNGs to gh-pages (live site) ───────────────
+      - name: Sync sprites → gh-pages
+        if: steps.commit_main.outputs.new == 'true'
+        run: |
+          git fetch origin gh-pages
+          git checkout gh-pages
+
+          # Copy just the sprites directory from main
+          git checkout main -- assets/sprites/
+          git add assets/sprites/
+
+          if git diff --staged --quiet; then
+            echo "gh-pages already up to date."
+          else
+            git commit -m "chore: sync AI sprite sheets to gh-pages [skip ci]"
+            git push origin gh-pages
+            echo "✓ Live site updated — sprites available on GitHub Pages"
+          fi

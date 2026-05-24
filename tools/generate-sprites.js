@@ -232,15 +232,23 @@ const CHARACTERS = [
 
 // ── API helpers ───────────────────────────────────────────────
 async function apiGenerate(prompt) {
-  const body = JSON.stringify({
+  // Build request body — include response_format for dall-e-3 compat
+  const reqBody = {
     model: MODEL,
     prompt,
     n: 1,
     size: '1024x1024',
-    quality: 'standard',
-    background: 'transparent',
-    output_format: 'png',
-  });
+  };
+
+  // gpt-image-1 specific params (silently ignored by other models)
+  if (MODEL.startsWith('gpt-image')) {
+    reqBody.quality = 'standard';
+    reqBody.background = 'transparent';
+    reqBody.output_format = 'png';
+  } else {
+    // dall-e-3 / dall-e-2
+    reqBody.response_format = 'b64_json';
+  }
 
   const res = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
@@ -248,12 +256,13 @@ async function apiGenerate(prompt) {
       'Authorization': `Bearer ${API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body,
+    body: JSON.stringify(reqBody),
   });
 
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`API ${res.status}: ${err}`);
+    let errText = await res.text();
+    try { errText = JSON.stringify(JSON.parse(errText), null, 2); } catch {}
+    throw new Error(`API ${res.status} on generations:\n${errText}`);
   }
 
   const json = await res.json();
@@ -261,7 +270,7 @@ async function apiGenerate(prompt) {
 
   if (item.b64_json) return Buffer.from(item.b64_json, 'base64');
 
-  // URL response: download it
+  // URL response (dall-e-3 default): download it
   const imgRes = await fetch(item.url);
   return Buffer.from(await imgRes.arrayBuffer());
 }
@@ -282,8 +291,9 @@ async function apiEdit(imageBuffer, prompt) {
   });
 
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Edit API ${res.status}: ${err}`);
+    let errText = await res.text();
+    try { errText = JSON.stringify(JSON.parse(errText), null, 2); } catch {}
+    throw new Error(`API ${res.status} on edits:\n${errText}`);
   }
 
   const json = await res.json();
