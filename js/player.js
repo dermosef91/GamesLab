@@ -31,6 +31,11 @@ class Player {
     this.dx = 0;
     this.dy = 0;
 
+    // Sprite animation state
+    this.spriteDir   = 'front';   // 'front'|'side'|'sideLeft'|'back'
+    this.walkFrame   = 'idle';    // 'idle'|'walk1'|'walk2'
+    this.walkTimer   = 0;
+
     // Invincibility after hit
     this.invincibleTimer = 0;
     this.invincibleFlash = 0;
@@ -87,6 +92,22 @@ class Player {
     const spd = this.speed;
     this.x = Utils.clamp(this.x + ndx * spd * dt, 0, CONFIG.WORLD_WIDTH);
     this.y = Utils.clamp(this.y + ndy * spd * dt, 0, CONFIG.WORLD_HEIGHT);
+
+    // ── Sprite animation ──────────────────────────────────
+    const moving = Math.abs(this.dx) + Math.abs(this.dy) > 0.05;
+    if (moving) {
+      this.walkTimer += dt;
+      this.walkFrame = (this.walkTimer % 0.6) < 0.3 ? 'walk1' : 'walk2';
+      // Choose view direction from facing vector
+      if (Math.abs(this.facingX) > Math.abs(this.facingY) * 1.2) {
+        this.spriteDir = this.facingX > 0 ? 'side' : 'sideLeft';
+      } else {
+        this.spriteDir = this.facingY >= 0 ? 'front' : 'back';
+      }
+    } else {
+      this.walkFrame = 'idle';
+      this.walkTimer = 0;
+    }
 
     // Invincibility timer
     if (this.invincibleTimer > 0) this.invincibleTimer -= dt * 1000;
@@ -234,9 +255,9 @@ class Player {
     ctx.stroke();
     ctx.restore();
 
-    // Hero sprite
+    // Hero sprite (with animation direction and walk frame)
     ctx.save();
-    Sprites.drawHero(ctx, this.characterId, x, y, r * 0.75, color);
+    Sprites.drawHero(ctx, this.characterId, x, y, r * 0.75, color, this.spriteDir, this.walkFrame);
     ctx.restore();
 
     // Facing direction indicator
