@@ -3,6 +3,12 @@ name: Generate Pixel Art Sprites
 # Manual trigger from the Actions tab.
 # Set OPENAI_API_KEY in Settings → Secrets and variables → Actions first.
 on:
+  # I trigger this by pushing to run/generate-sprites branch
+  push:
+    branches:
+      - run/generate-sprites
+
+  # Also manually triggerable from the Actions tab
   workflow_dispatch:
     inputs:
       characters:
