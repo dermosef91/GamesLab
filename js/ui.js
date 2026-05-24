@@ -122,14 +122,12 @@ class UI {
     ctx.fill();
     ctx.stroke();
 
-    // Icon
-    ctx.font = `${Math.min(w * 0.4, 52)}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    // Hero sprite
+    ctx.save();
     ctx.shadowBlur = 20;
     ctx.shadowColor = charDef.color;
-    ctx.fillStyle = '#fff';
-    ctx.fillText(charDef.icon, cx, cy - h * 0.22);
+    Sprites.drawHero(ctx, charDef.id, cx, cy - h * 0.22, Math.min(w * 0.22, 30), charDef.color);
+    ctx.restore();
 
     // Name
     ctx.font = `bold ${Math.min(w * 0.14, 14)}px 'Courier New', monospace`;
@@ -165,8 +163,11 @@ class UI {
       this._roundRect(ctx, cx - w / 2, cy - h / 2, w, h, 12);
       ctx.fill();
       ctx.globalAlpha = 1;
-      ctx.font = '28px sans-serif';
-      ctx.fillText('🔒', cx, cy);
+      ctx.fillStyle = '#888';
+      ctx.font = `bold 22px 'Courier New', monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('[LOCKED]', cx, cy);
       ctx.fillStyle = CONFIG.COLORS.starWhite;
       ctx.font = `${Math.min(w * 0.1, 10)}px 'Courier New', monospace`;
       ctx.fillText('Unlock in Boons', cx, cy + 26);
@@ -195,7 +196,7 @@ class UI {
     const hpBarW = Math.min(W * 0.55, 260);
     const hpBarH = 14;
     const hpX = 16, hpY = 16;
-    this._drawBar(ctx, hpX, hpY, hpBarW, hpBarH, player.hp / player.maxHp, '#ff3333', '#330000', '❤');
+    this._drawBar(ctx, hpX, hpY, hpBarW, hpBarH, player.hp / player.maxHp, '#ff3333', '#330000', true);
 
     // XP bar
     const xpBarW = Math.min(W * 0.55, 260);
@@ -232,7 +233,7 @@ class UI {
 
     // Pause button (top right)
     this.pauseBtn = { x: W - 54, y: 8, w: 46, h: 34 };
-    this._drawButton(ctx, W - 31, 25, 46, 32, '⏸', '#555', '#1a0a2e', 11);
+    this._drawButton(ctx, W - 31, 25, 46, 32, 'II', '#555', '#1a0a2e', 13);
   }
 
   _drawBar(ctx, x, y, w, h, ratio, fillColor, bgColor, icon) {
@@ -246,8 +247,7 @@ class UI {
     this._roundRect(ctx, x, y, w * Math.max(0, Math.min(1, ratio)), h, 4);
     ctx.fill();
     if (icon) {
-      ctx.font = `${h + 4}px sans-serif`;
-      ctx.fillText(icon, x - 16, y + h * 0.8);
+      Sprites.hpIcon(ctx, x - 16, y + h * 0.5, h + 2, '#ff3333');
     }
     ctx.restore();
   }
@@ -271,11 +271,8 @@ class UI {
       ctx.fill();
       ctx.stroke();
 
-      // Icon
-      ctx.font = `${iconSize * 0.55}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(w.def.icon, x + iconSize / 2, barY + iconSize * 0.42);
+      // Weapon sprite icon
+      Sprites.drawWeapon(ctx, w.def.id, x + iconSize / 2, barY + iconSize / 2, iconSize * 0.38, w.def.color);
 
       // Level pips
       ctx.fillStyle = w.def.color;
@@ -316,7 +313,7 @@ class UI {
     ctx.textAlign = 'center';
     ctx.shadowBlur = 10;
     ctx.shadowColor = boss.color;
-    ctx.fillText(`⚔ ${boss.def.name} ⚔`, W / 2, barY - 6);
+    ctx.fillText(`>> ${boss.def.name} <<`, W / 2, barY - 6);
     ctx.restore();
   }
 
@@ -340,7 +337,7 @@ class UI {
     ctx.shadowBlur = 20;
     ctx.shadowColor = CONFIG.COLORS.gold;
     ctx.globalAlpha = this.cardAnim;
-    ctx.fillText(`⚡ LEVEL ${this.game.player ? this.game.player.level : ''} ⚡`, W / 2, H * 0.15);
+    ctx.fillText(`-- LEVEL ${this.game.player ? this.game.player.level : ''} --`, W / 2, H * 0.15);
     ctx.fillStyle = CONFIG.COLORS.starWhite;
     ctx.globalAlpha = this.cardAnim * 0.7;
     ctx.font = `${Math.min(W * 0.035, 15)}px 'Courier New', monospace`;
@@ -377,11 +374,10 @@ class UI {
     ctx.fill();
     ctx.stroke();
 
-    // Icon
-    ctx.font = `${h * 0.5}px sans-serif`;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(choice.icon, cx - w / 2 + 16, cy);
+    // Choice sprite icon
+    ctx.save();
+    Sprites.drawChoice(ctx, choice, cx - w / 2 + h * 0.5, cy, h * 0.42);
+    ctx.restore();
 
     // Name
     ctx.fillStyle = choice.color;
@@ -410,7 +406,7 @@ class UI {
     ctx.fillRect(0, 0, W, H);
     ctx.restore();
 
-    const title = won ? '✨ VICTORY ✨' : '💀 FALLEN 💀';
+    const title = won ? '-- VICTORY --' : '-- FALLEN --';
     const titleColor = won ? CONFIG.COLORS.gold : '#ff3333';
     ctx.save();
     ctx.textAlign = 'center';
@@ -482,11 +478,10 @@ class UI {
       ctx.fill();
       ctx.stroke();
 
-      // Icon
-      ctx.font = `${cardH * 0.55}px sans-serif`;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(boon.icon, cx - cardW / 2 + 12, cy);
+      // Boon sprite icon
+      ctx.save();
+      Sprites.drawBoon(ctx, boon.id, cx - cardW / 2 + cardH * 0.5, cy, cardH * 0.38, maxed ? '#888' : (canBuy ? CONFIG.COLORS.gold : '#666'));
+      ctx.restore();
 
       // Name
       ctx.fillStyle = maxed ? '#aaa' : CONFIG.COLORS.starWhite;

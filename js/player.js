@@ -234,12 +234,9 @@ class Player {
     ctx.stroke();
     ctx.restore();
 
-    // Inner icon ring
+    // Hero sprite
     ctx.save();
-    ctx.font = `${r}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(this.charDef.icon, x, y);
+    Sprites.drawHero(ctx, this.characterId, x, y, r * 0.75, color);
     ctx.restore();
 
     // Facing direction indicator
