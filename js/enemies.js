@@ -139,8 +139,8 @@ function drawEnemyHex(ctx, e, color, icon) {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Sprite
-  Sprites.drawEnemy(ctx, e.id, x, y, r * 0.62, color);
+  // Sprite (with animation direction and walk frame)
+  Sprites.drawEnemy(ctx, e.id, x, y, r * 0.62, color, e.spriteDir || 'front', e.walkFrame || 'idle');
 
   // HP bar
   if (e.hp < e.maxHp) {
@@ -184,8 +184,8 @@ function drawBoss(ctx, e, color, icon) {
   ctx.lineWidth = 3;
   ctx.stroke();
 
-  // Sprite
-  Sprites.drawEnemy(ctx, e.id, x, y, size * 0.58, color);
+  // Sprite (with animation direction and walk frame)
+  Sprites.drawEnemy(ctx, e.id, x, y, size * 0.58, color, e.spriteDir || 'front', e.walkFrame || 'idle');
 
   // Boss HP bar (full width at bottom)
   ctx.restore();
@@ -225,6 +225,13 @@ class Enemy {
     this.bossPhase = 0;
     this.bossActionTimer = 0;
     this.bossLaserTimer = 0;
+
+    // Sprite animation state
+    this.spriteDir  = 'front';  // 'front'|'side'|'sideLeft'|'back'
+    this.walkFrame  = 'idle';   // 'idle'|'walk1'|'walk2'
+    this.walkTimer  = 0;
+    this._prevX     = x;
+    this._prevY     = y;
   }
 
   takeDamage(amount, player, particles) {
@@ -282,6 +289,9 @@ class Enemy {
 
     const effectiveSpeed = this.speed * this.slowFactor;
 
+    this._prevX = this.x;
+    this._prevY = this.y;
+
     switch (this.ai) {
       case 'chase':     this._aiChase(dt, player, effectiveSpeed); break;
       case 'ranged':    this._aiRanged(dt, player, effectiveSpeed, projectiles, particles); break;
@@ -289,6 +299,23 @@ class Enemy {
       case 'gemStealer':this._aiGemStealer(dt, player, particles, effectiveSpeed); break;
       case 'boss_nullKing': this._aiBossNullKing(dt, player, projectiles, particles, effectiveSpeed); break;
       case 'boss_drake': this._aiBossDrake(dt, player, projectiles, particles, effectiveSpeed); break;
+    }
+
+    // ── Sprite animation ──────────────────────────────────
+    const mvx = this.x - this._prevX;
+    const mvy = this.y - this._prevY;
+    const moved = Math.abs(mvx) + Math.abs(mvy) > 0.005;
+    if (moved) {
+      this.walkTimer += dt;
+      this.walkFrame = (this.walkTimer % 0.5) < 0.25 ? 'walk1' : 'walk2';
+      if (Math.abs(mvx) > Math.abs(mvy) * 1.2) {
+        this.spriteDir = mvx > 0 ? 'side' : 'sideLeft';
+      } else {
+        this.spriteDir = mvy >= 0 ? 'front' : 'back';
+      }
+    } else {
+      this.walkFrame = 'idle';
+      this.walkTimer = 0;
     }
 
     // Touch damage
