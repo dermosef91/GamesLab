@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0d0515" />
+  <title>Ancestors: Awakening</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Loading screen (hidden by JS once ready) -->
+  <div id="loadingScreen">
+    <h1>✦ ANCESTORS<br>AWAKENING ✦</h1>
+    <p>Summoning the ancestors…</p>
+  </div>
+
+  <!-- Game canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Scripts (order matters — dependencies first) -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/enemies.js"></script>
+  <script src="js/weapons.js"></script>
+  <script src="js/upgrades.js"></script>
+  <script src="js/meta.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    // Hide loading screen once page is ready
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const ls = document.getElementById('loadingScreen');
+        if (ls) ls.classList.add('hidden');
+        setTimeout(() => { if (ls) ls.remove(); }, 600);
+      }, 400);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+/* ============================================================
+   AFROFUTURISM SURVIVORS — CSS
+   Mobile-first, full-screen canvas game
+   ============================================================ */
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0d0515;
+  font-family: 'Courier New', Courier, monospace;
+  color: #e8e0ff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+/* Full-screen canvas */
+#gameCanvas {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;
+  cursor: default;
+}
+
+/* Loading overlay (shown before JS boots) */
+#loadingScreen {
+  position: fixed;
+  inset: 0;
+  background: #0d0515;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  transition: opacity 0.5s;
+}
+
+#loadingScreen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#loadingScreen h1 {
+  font-size: clamp(20px, 6vw, 42px);
+  color: #ffd700;
+  text-shadow: 0 0 20px #ffd700;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+#loadingScreen p {
+  margin-top: 12px;
+  font-size: clamp(11px, 3vw, 15px);
+  color: #00ffcc;
+  text-shadow: 0 0 10px #00ffcc;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* Pulsing loading dots */
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* Prevent iOS bounce scroll */
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe area support (notches) */
+#gameCanvas {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
