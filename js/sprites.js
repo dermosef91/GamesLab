@@ -781,10 +781,21 @@ const Sprites = {
   hpIcon(ctx, cx, cy, s) { this.passive_vitality(ctx, cx, cy, s, '#ff3333'); },
 
   // ── DISPATCHERS ───────────────────────────────────────────
-  drawHero(ctx, id, cx, cy, size, color) {
+  // dir: 'front'|'side'|'sideLeft'|'back'   frame: 'idle'|'walk1'|'walk2'
+  drawHero(ctx, id, cx, cy, size, color, dir = 'front', frame = 'idle') {
+    // Try preloaded image sprite first
+    if (typeof SpriteLoader !== 'undefined' && SpriteLoader.hasSheet(id)) {
+      if (SpriteLoader.draw(ctx, id, dir, frame, cx, cy, size)) return;
+    }
+    // Canvas fallback
     const fn = this[`hero_${id}`]; if (fn) fn.call(this, ctx, cx, cy, size, color);
   },
-  drawEnemy(ctx, id, cx, cy, size, color) {
+  drawEnemy(ctx, id, cx, cy, size, color, dir = 'front', frame = 'idle') {
+    // Try preloaded image sprite first
+    if (typeof SpriteLoader !== 'undefined' && SpriteLoader.hasSheet(id)) {
+      if (SpriteLoader.draw(ctx, id, dir, frame, cx, cy, size)) return;
+    }
+    // Canvas fallback
     const fn = this[`enemy_${id}`]; if (fn) fn.call(this, ctx, cx, cy, size, color);
   },
   drawWeapon(ctx, id, cx, cy, size, color) {
