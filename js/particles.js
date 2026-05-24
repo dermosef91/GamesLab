@@ -67,8 +67,8 @@ class ParticleSystem {
   spawnGem(x, y, value = 1) {
     this.xpGems.push({
       x, y,
-      vx: Utils.rand(-60, 60),
-      vy: Utils.rand(-80, -20),
+      vx: Utils.rand(-50, 50),
+      vy: Utils.rand(-50, 50),
       value,
       collected: false,
       active: true,
@@ -95,7 +95,7 @@ class ParticleSystem {
     this.xpGems.push({
       x, y,
       vx: Utils.rand(-50, 50),
-      vy: Utils.rand(-70, -20),
+      vy: Utils.rand(-50, 50),
       value,
       isEssence: true,
       collected: false,
@@ -122,15 +122,16 @@ class ParticleSystem {
       if (p.life <= 0) this.particles.splice(i, 1);
     }
 
-    // XP Gems gravity settle
+    // XP Gems — scatter then settle in place (top-down, no gravity)
     for (let i = 0; i < this.xpGems.length; i++) {
       const g = this.xpGems[i];
       if (!g.active) continue;
       if (!g.magnetTarget) {
-        g.vy += gravity * dt;
         g.x += g.vx * dt;
         g.y += g.vy * dt;
-        g.vx *= (1 - dt * 3);
+        // Friction: velocity decays to zero quickly
+        g.vx *= (1 - dt * 6);
+        g.vy *= (1 - dt * 6);
         g.pulse += dt * 4;
       }
     }
