@@ -26,8 +26,9 @@ const args = Object.fromEntries(
 );
 
 const API_KEY    = args.key || process.env.OPENAI_API_KEY || loadEnvKey();
-const MODEL      = args.model || 'gpt-image-1';
-const SKIP_TMPL  = !!args['skip-template'];
+const MODEL      = args.model || 'dall-e-3';
+// dall-e-3 doesn't support the images/edits endpoint; skip template automatically
+const SKIP_TMPL  = !!args['skip-template'] || MODEL.startsWith('dall-e');
 const ONLY       = args.only ? args.only.split(',') : null;
 const OUT_DIR    = path.resolve(__dirname, '../assets/sprites');
 const TMPL_PATH  = path.join(OUT_DIR, 'template.png');
@@ -409,6 +410,11 @@ async function main() {
   console.log(`\n══════════════════════════════════`);
   console.log(`Done — ${files.length} sprite sheet(s) in assets/sprites/`);
   console.log(`Next: open index.html and verify sprites load in-game.`);
+
+  if (files.length === 0) {
+    console.error('\n✗ ERROR: Zero sprite sheets in assets/sprites/ — check API errors above.');
+    process.exit(1);
+  }
 }
 
 main().catch(e => { console.error('Fatal:', e); process.exit(1); });
