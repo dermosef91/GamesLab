@@ -16,11 +16,11 @@ on:
         required: false
         default: ''
       model:
-        description: 'OpenAI Image model'
+        description: 'OpenAI Image model (dall-e-3 recommended; gpt-image-1 needs access tier)'
         required: false
-        default: 'gpt-image-1'
+        default: 'dall-e-3'
       skip_template:
-        description: 'Skip template regeneration (uses existing template.png)'
+        description: 'Skip template regeneration (auto-enabled for dall-e-3 which has no edit API)'
         type: boolean
         default: false
 
@@ -52,12 +52,15 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          ARGS="--model=${{ inputs.model || 'gpt-image-1' }}"
+          MODEL="${{ inputs.model || 'dall-e-3' }}"
+          ARGS="--model=${MODEL}"
 
           if [ -n "${{ inputs.characters }}" ]; then
             ARGS="$ARGS --only=${{ inputs.characters }}"
           fi
 
+          # skip_template is auto-forced by the script for dall-e-* models.
+          # Allow workflow_dispatch to also force it explicitly.
           if [ "${{ inputs.skip_template }}" = "true" ]; then
             ARGS="$ARGS --skip-template"
           fi
