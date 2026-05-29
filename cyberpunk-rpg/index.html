@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a1a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Ubuntu Protocol</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="loadingScreen">
+    <div class="loading-content">
+      <div class="loading-logo">UBUNTU PROTOCOL</div>
+      <div class="loading-sub">NEO-ACCRA // 2187</div>
+      <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+      <div class="loading-status" id="loadingStatus">Initializing neural interface...</div>
+    </div>
+  </div>
+
+  <div id="gameContainer">
+    <!-- Three.js appends its WebGL canvas here -->
+  </div>
+
+  <canvas id="hudCanvas"></canvas>
+
+  <!-- Dialogue overlay -->
+  <div id="dialogueBox" class="hidden">
+    <div id="dialoguePortrait">
+      <canvas id="portraitCanvas" width="80" height="80"></canvas>
+    </div>
+    <div id="dialogueContent">
+      <div id="dialogueSpeaker"></div>
+      <div id="dialogueText"></div>
+    </div>
+    <div id="dialogueChoices" class="hidden"></div>
+    <div id="dialogueContinue">▼ TAP TO CONTINUE</div>
+  </div>
+
+  <!-- Battle UI overlay -->
+  <div id="battleUI" class="hidden">
+    <div id="partyStatus"></div>
+    <div id="battleLog"></div>
+    <div id="actionMenu"></div>
+  </div>
+
+  <!-- Screen overlays -->
+  <div id="titleScreen" class="hidden">
+    <div class="title-content">
+      <div class="title-logo">UBUNTU PROTOCOL</div>
+      <div class="title-tagline">I am because we are.</div>
+      <div class="title-sub">NEO-ACCRA // 2187</div>
+      <button class="btn-primary" id="btnNewGame">NEW GAME</button>
+      <button class="btn-secondary" id="btnContinue" style="display:none">CONTINUE</button>
+    </div>
+  </div>
+
+  <div id="victoryScreen" class="hidden">
+    <div class="overlay-content">
+      <div class="overlay-title gold">UBUNTU PROTOCOL ACTIVATED</div>
+      <div id="victoryStats"></div>
+      <button class="btn-primary" id="btnVictoryMenu">MAIN MENU</button>
+    </div>
+  </div>
+
+  <div id="defeatScreen" class="hidden">
+    <div class="overlay-content">
+      <div class="overlay-title red">SIGNAL LOST</div>
+      <div class="overlay-sub">The ancestors await your return.</div>
+      <button class="btn-primary" id="btnRetry">RETRY</button>
+      <button class="btn-secondary" id="btnDefeatMenu">MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- Three.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Game scripts in dependency order -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/story.js"></script>
+  <script src="js/party.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/dialogue.js"></script>
+  <script src="js/battle.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
