@@ -26,8 +26,9 @@ const args = Object.fromEntries(
 );
 
 const API_KEY    = args.key || process.env.OPENAI_API_KEY || loadEnvKey();
-const MODEL      = args.model || 'gpt-image-1';
-const SKIP_TMPL  = !!args['skip-template'];
+const MODEL      = args.model || 'dall-e-3';
+// dall-e-3 doesn't support the images/edits endpoint; skip template automatically
+const SKIP_TMPL  = !!args['skip-template'] || MODEL.startsWith('dall-e');
 const ONLY       = args.only ? args.only.split(',') : null;
 const OUT_DIR    = path.resolve(__dirname, '../assets/sprites');
 const TMPL_PATH  = path.join(OUT_DIR, 'template.png');
@@ -232,15 +233,23 @@ const CHARACTERS = [
 
 // ── API helpers ───────────────────────────────────────────────
 async function apiGenerate(prompt) {
-  const body = JSON.stringify({
+  // Build request body — include response_format for dall-e-3 compat
+  const reqBody = {
     model: MODEL,
     prompt,
     n: 1,
     size: '1024x1024',
-    quality: 'standard',
-    background: 'transparent',
-    output_format: 'png',
-  });
+  };
+
+  // gpt-image-1 specific params (silently ignored by other models)
+  if (MODEL.startsWith('gpt-image')) {
+    reqBody.quality = 'standard';
+    reqBody.background = 'transparent';
+    reqBody.output_format = 'png';
+  } else {
+    // dall-e-3 / dall-e-2
+    reqBody.response_format = 'b64_json';
+  }
 
   const res = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
@@ -248,12 +257,13 @@ async function apiGenerate(prompt) {
       'Authorization': `Bearer ${API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body,
+    body: JSON.stringify(reqBody),
   });
 
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`API ${res.status}: ${err}`);
+    let errText = await res.text();
+    try { errText = JSON.stringify(JSON.parse(errText), null, 2); } catch {}
+    throw new Error(`API ${res.status} on generations:\n${errText}`);
   }
 
   const json = await res.json();
@@ -261,7 +271,7 @@ async function apiGenerate(prompt) {
 
   if (item.b64_json) return Buffer.from(item.b64_json, 'base64');
 
-  // URL response: download it
+  // URL response (dall-e-3 default): download it
   const imgRes = await fetch(item.url);
   return Buffer.from(await imgRes.arrayBuffer());
 }
@@ -282,8 +292,9 @@ async function apiEdit(imageBuffer, prompt) {
   });
 
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Edit API ${res.status}: ${err}`);
+    let errText = await res.text();
+    try { errText = JSON.stringify(JSON.parse(errText), null, 2); } catch {}
+    throw new Error(`API ${res.status} on edits:\n${errText}`);
   }
 
   const json = await res.json();
@@ -399,6 +410,11 @@ async function main() {
   console.log(`\n══════════════════════════════════`);
   console.log(`Done — ${files.length} sprite sheet(s) in assets/sprites/`);
   console.log(`Next: open index.html and verify sprites load in-game.`);
+
+  if (files.length === 0) {
+    console.error('\n✗ ERROR: Zero sprite sheets in assets/sprites/ — check API errors above.');
+    process.exit(1);
+  }
 }
 
 main().catch(e => { console.error('Fatal:', e); process.exit(1); });
